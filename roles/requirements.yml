@@ -1,0 +1,8 @@
+---
+- name: ansible-role-java
+  src: https://github.com/hollardjf/ansible-role-java.git
+- name: ansible-unarchive-deps
+  src: https://github.com/hollardjf/ansible-unarchive-deps.git
+- name: ansible-role-spark
+  src: https://github.com/hollardjf/ansible-role-spark.git
+

@@ -1,0 +1,45 @@
+---
+- hosts: all
+  become: true
+  environment:
+    https_proxy: http://192.168.56.101:3128
+  roles:
+    - role: ansible-role-java
+      java_packages:
+        - openjdk-8-jdk
+    - role: ansible-role-spark
+  post_tasks:
+    - name: enable /etc/rc.local
+      file:
+        path: /etc/rc.local
+        owner: root
+        group: root        
+        mode: 755
+    - name: check 1 /etc/rc.local
+      lineinfile:
+        dest: /etc/rc.local
+        line: "#!/bin/sh -e"
+        insertbefore: BOF      
+    - name: check 2 /etc/rc.local
+      lineinfile:
+        dest: /etc/rc.local
+        line: exit 0
+        state: present
+        insertafter: EOF
+    - name: "add spark master on startup"
+      lineinfile:
+        dest: /etc/rc.local
+        line: /opt/apps/spark/sbin/start-master.sh
+        insertbefore: exit 0
+    - name: "start spark master"
+      shell: "/opt/apps/spark/sbin/start-master.sh"
+    - name: "add spark slave on startup"
+      lineinfile:
+        dest: /etc/rc.local
+        line: /opt/apps/spark/sbin/start-slave.sh spark://$(hostname):7077
+        insertbefore: exit 0    
+    - name: "start spark slave"
+      shell: "/opt/apps/spark/sbin/start-slave.sh spark://$(hostname):7077"        
+
+
+      
